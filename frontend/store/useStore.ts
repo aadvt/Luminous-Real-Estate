@@ -67,15 +67,6 @@ interface DashboardState {
   valuations: ValuationRecord[]
   setValuations: (vals: ValuationRecord[]) => void
 
-  // Pipeline 2: User Query Flow
-  agentTranscript: string
-  isStreaming: boolean
-  setTranscript: (text: string) => void
-  appendToken: (token: string) => void
-  setIsStreaming: (isStreaming: boolean) => void
-  overrideScore: number | null
-  setOverrideScore: (score: number | null) => void
-  
   // Pipeline 2: Scenario Lab
   scenarioResult: ScenarioResult | null
   setScenarioResult: (result: ScenarioResult | null) => void
@@ -88,19 +79,10 @@ interface DashboardState {
   addPropagationStep: (step: string) => void
   isTracing: boolean
   setIsTracing: (tracing: boolean) => void
-  
-  // Pipeline 3: Voice Pipeline
-  voiceStatus: VoiceStatus
-  setVoiceStatus: (status: VoiceStatus) => void
-  audioLevel: number
-  setAudioLevel: (level: number) => void
 
-  // Chat Sidebar
-  isChatOpen: boolean
-  setIsChatOpen: (open: boolean) => void
-  messages: ChatMessage[]
-  addMessage: (role: 'user' | 'assistant', content: string) => void
-  clearMessages: () => void
+  // Data Ingestion Pipeline Sidebar
+  isPipelineOpen: boolean
+  setIsPipelineOpen: (open: boolean) => void
 
   // New: Zone Selection
   selectedZone: ZoneData | null
@@ -144,15 +126,6 @@ export const useStore = create<DashboardState>((set) => ({
   valuations: [],
   setValuations: (vals) => set({ valuations: vals }),
 
-  // Pipeline 2: NL Query
-  agentTranscript: '',
-  isStreaming: false,
-  setTranscript: (text) => set({ agentTranscript: text }),
-  appendToken: (token) => set((state) => ({ agentTranscript: state.agentTranscript + token })),
-  setIsStreaming: (isStreaming) => set({ isStreaming }),
-  overrideScore: null,
-  setOverrideScore: (score) => set({ overrideScore: score }),
-
   // Pipeline 2: Scenario
   scenarioResult: null,
   setScenarioResult: (result) => set({ scenarioResult: result }),
@@ -166,20 +139,9 @@ export const useStore = create<DashboardState>((set) => ({
   isTracing: false,
   setIsTracing: (tracing) => set({ isTracing: tracing }),
 
-  // Pipeline 3: Voice
-  voiceStatus: 'idle',
-  setVoiceStatus: (status) => set({ voiceStatus: status }),
-  audioLevel: 0,
-  setAudioLevel: (level) => set({ audioLevel: level }),
-
-  // Chat Sidebar
-  isChatOpen: true, // Default open to show off the new feature
-  setIsChatOpen: (open) => set({ isChatOpen: open }),
-  messages: [],
-  addMessage: (role, content) => set((state) => ({ 
-    messages: [...state.messages, { id: Math.random().toString(36).substring(7), role, content }] 
-  })),
-  clearMessages: () => set({ messages: [] }),
+  // Data Ingestion Pipeline Sidebar
+  isPipelineOpen: true, // Default open to showcase the pipeline data scraper logs
+  setIsPipelineOpen: (open) => set({ isPipelineOpen: open }),
 
   // Zone Selection
   selectedZone: null,

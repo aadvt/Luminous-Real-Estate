@@ -28,7 +28,7 @@ const MapboxReality = () => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const [mapLoaded, setMapLoaded] = useState(false)
-  const { valuationMap, mapTarget, activeRegion, bubbleFlags, overrideScore, setSelectedZone, selectedZone } = useStore()
+  const { valuationMap, mapTarget, activeRegion, bubbleFlags, setSelectedZone, selectedZone } = useStore()
 
   const sceneStateRef = useRef({
     lngLat: BKC_CENTER as [number, number],
@@ -56,15 +56,14 @@ const MapboxReality = () => {
     }
 
     const flag = bubbleFlags?.find(f => f.region.toLowerCase() === activeRegion?.toLowerCase())
-    // Fall back to overrideScore if active (e.g. for voice command simulation spikes)
-    const score = overrideScore !== null ? overrideScore : flag ? flag.overall_score : 50
+    const score = flag ? flag.overall_score : 50
 
     if (sceneStateRef.current) {
       sceneStateRef.current.lngLat = targetLngLat
       sceneStateRef.current.score = score
       sceneStateRef.current.needsUpdate = true
     }
-  }, [mapTarget, activeRegion, bubbleFlags, overrideScore])
+  }, [mapTarget, activeRegion, bubbleFlags])
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return
@@ -584,7 +583,7 @@ const MapboxReality = () => {
     if (!map.current || !mapLoaded) return
 
     const flag = bubbleFlags?.find(f => f.region.toLowerCase() === activeRegion?.toLowerCase())
-    const score = overrideScore !== null ? overrideScore : flag ? flag.overall_score : 50
+    const score = flag ? flag.overall_score : 50
 
     // The user requested: make economic parameters HIT HARDER.
     // Fixed height mapping is now modulated by specific type sensitivities.
@@ -622,7 +621,7 @@ const MapboxReality = () => {
         ['interpolate', ['linear'], ['get', 'height'], 0, baseGreen, 60, defaultRisk, 150, dangerRed]
       ])
     }
-  }, [activeRegion, bubbleFlags, mapLoaded, overrideScore])
+  }, [activeRegion, bubbleFlags, mapLoaded])
 
   // --- STOCHASTIC JITTER: Real-time 'Flicker' based on Volatility ---
   useEffect(() => {

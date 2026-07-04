@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str
     
     APP_ENV: str = "development"
-    MACRO_REFRESH_INTERVAL_MINUTES: int = 15
-    AGENT_RUN_INTERVAL_MINUTES: int = 30
+    MACRO_REFRESH_INTERVAL_MINUTES: int = 4320
+    AGENT_RUN_INTERVAL_MINUTES: int = 4320
 
     # Ingestion URLs
     WORLD_BANK_BASE_URL: str = "https://api.worldbank.org/v2"

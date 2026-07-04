@@ -10,7 +10,6 @@ const ScenarioLab = () => {
   const { 
     isScenarioLabOpen, 
     setIsScenarioLabOpen, 
-    setOverrideScore, 
     activeRegion,
     setIsTracing,
     setPropagationSteps
@@ -52,14 +51,7 @@ const ScenarioLab = () => {
         setPropagationSteps(data.propagation_trace)
       }
       
-      // Flash the map with the real mathematical probability of loss
-      const riskScore = Math.min(Math.round(data.prob_below_current * 100) + 10, 100)
-      setOverrideScore(riskScore)
-      
-      // Keep map highlighted to allow observation
-      setTimeout(() => {
-        setOverrideScore(null)
-      }, 10000)
+      // Simulation complete, display values in ScenarioLab HUD
       
     } catch (err) {
       console.error('Simulation failed:', err)

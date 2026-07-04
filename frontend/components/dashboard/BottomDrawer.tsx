@@ -8,7 +8,7 @@ import { ConfidenceGauge, MarketQuadrant } from './MarketCharts'
 import { ChevronUp, ChevronDown, X } from 'lucide-react'
 
 const BottomDrawer = () => {
-  const { agentTranscript, macroSnapshot, backendStatus, bubbleFlags, activeRegion } = useStore()
+  const { macroSnapshot, backendStatus, bubbleFlags, activeRegion } = useStore()
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Find the bubble flag matching the active region

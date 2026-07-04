@@ -30,20 +30,6 @@ class WebSocketClient {
             })
           }
 
-          // Pipeline 2: User Query (if via WS instead of SSE)
-          if (data.type === 'agent_token') {
-            useStore.getState().appendToken(data.token)
-          }
-
-          if (data.type === 'agent_done') {
-            useStore.getState().setIsStreaming(false)
-          }
-
-          // Pipeline 3: Voice State Updates
-          if (data.type === 'voice_status') {
-             useStore.getState().setVoiceStatus(data.status)
-          }
-
         } catch (error) {
           console.error('Error parsing WS message:', error)
         }

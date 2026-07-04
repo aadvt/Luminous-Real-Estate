@@ -9,7 +9,7 @@ import BottomDrawer from '@/components/dashboard/BottomDrawer'
 import PropertyPanel from '@/components/dashboard/PropertyPanel'
 import ScenarioLab from '@/components/dashboard/ScenarioLab'
 import PropagationHUD from '@/components/dashboard/PropagationHUD'
-import AIChatSidebar from '@/components/dashboard/AIChatSidebar'
+import DataPipelineSidebar from '@/components/dashboard/DataPipelineSidebar'
 import ZoneInsights from '@/components/dashboard/ZoneInsights'
 
 const HUD = () => {
@@ -98,7 +98,7 @@ const HUD = () => {
       <PropagationHUD />
 
       {/* NEW AI CHAT SIDEBAR (LEFT) */}
-      <AIChatSidebar />
+      <DataPipelineSidebar />
 
       {/* NEW ZONE INSIGHTS SIDEBAR (RIGHT) */}
       <ZoneInsights />

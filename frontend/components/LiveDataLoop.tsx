@@ -39,7 +39,6 @@ const LiveDataLoop = () => {
     setValuations,
     setValuation,
     setScenarioResult,
-    setAudioLevel,
   } = useStore()
 
   const sseRef = useRef<EventSource | null>(null)
@@ -142,7 +141,7 @@ const LiveDataLoop = () => {
       clearInterval(pollTimer)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [setBackendStatus, setMacroSnapshot, setBubbleFlags, setValuations, setValuation, setScenarioResult, setAudioLevel])
+  }, [setBackendStatus, setMacroSnapshot, setBubbleFlags, setValuations, setValuation, setScenarioResult])
 
   // --- SSE: Real-time alerts with exponential backoff ---
   useEffect(() => {
@@ -203,16 +202,7 @@ const LiveDataLoop = () => {
     }
   }, [setBubbleFlags, setValuation])
 
-  // --- Voice audio level simulation ---
-  useEffect(() => {
-    let angle = 0
-    const voiceInterval = setInterval(() => {
-      angle += 0.2
-      const level = Math.max(0, Math.sin(angle) * 0.4 + 0.4)
-      setAudioLevel(level)
-    }, 50)
-    return () => clearInterval(voiceInterval)
-  }, [setAudioLevel])
+
 
   return null
 }
