@@ -110,7 +110,7 @@ const ScenarioLab = () => {
       const safeRegion = activeRegion.replace(/[^a-z0-9]/gi, '_').toLowerCase()
 
       // Branded Header
-      doc.setFillColor(15, 77, 35) // #0f4d23
+      doc.setFillColor(30, 27, 46) // #1e1b2e
       doc.rect(0, 0, 210, 40, 'F')
       
       doc.setTextColor(255, 255, 255)
@@ -138,7 +138,7 @@ const ScenarioLab = () => {
           ['GDP Shock (Demand)', `${params.gdp_shock_pct}%`],
         ],
         theme: 'striped',
-        headStyles: { fillColor: [16, 185, 129] }
+        headStyles: { fillColor: [47, 191, 113] }
       })
 
       // Section 2: Results
@@ -155,7 +155,7 @@ const ScenarioLab = () => {
           ['Investment Safety Margin', `${((1 - result.prob_below_current) * 100).toFixed(2)}%`],
         ],
         theme: 'grid',
-        headStyles: { fillColor: [15, 77, 35] }
+        headStyles: { fillColor: [30, 27, 46] }
       })
 
       // Section 3: Narrative
@@ -191,33 +191,33 @@ const ScenarioLab = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed z-[60] bg-white/95 backdrop-blur-xl border border-[#0f4d2320] shadow-2xl flex flex-col overflow-hidden pointer-events-auto
+          className="fixed z-[60] bg-white/95 backdrop-blur-xl border-2 border-[#1e1b2e1f] shadow-[0_6px_0_rgba(30,27,46,0.08),0_24px_60px_rgba(30,27,46,0.18)] flex flex-col overflow-hidden pointer-events-auto
                      inset-x-3 bottom-3 top-auto max-h-[85vh] rounded-3xl
                      sm:inset-x-auto sm:top-24 sm:right-6 sm:bottom-40 sm:w-[420px] sm:max-h-none"
         >
           {/* HEADER */}
-          <div className="p-6 border-b border-[#0f4d2310] flex items-center justify-between bg-[#0f4d2305]">
+          <div className="p-6 border-b border-[#1e1b2e10] flex items-center justify-between bg-[#1e1b2e05]">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-[#0f4d23] rounded-xl text-yellow-400">
+              <div className="p-2 bg-[#1e1b2e] rounded-xl text-[#ffc845]">
                 <Zap size={18} fill="currentColor" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-[#0f4d23] font-headline">SCENARIO LAB</h2>
+                <h2 className="text-lg font-bold text-[#1e1b2e] font-headline">SCENARIO LAB</h2>
                 <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">MONTE CARLO STRESS TEST</p>
               </div>
             </div>
             <button 
               onClick={() => setIsScenarioLabOpen(false)}
-              className="p-2 hover:bg-[#0f4d2310] rounded-full transition-colors"
+              className="p-2 hover:bg-[#1e1b2e10] rounded-full transition-colors"
             >
-              <X size={20} className="text-[#0f4d23]" />
+              <X size={20} className="text-[#1e1b2e]" />
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-hide">
             {/* INSTRUCTIONS */}
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex gap-3 italic">
-              <Info size={16} className="text-[#0f4d23] mt-1 shrink-0" />
+              <Info size={16} className="text-[#1e1b2e] mt-1 shrink-0" />
               <p className="text-xs text-slate-600 leading-relaxed font-body">
                 Ask a &ldquo;what if&rdquo; in plain English, or fine-tune the macro sliders below.
                 Each run executes 10k Monte Carlo simulations on {activeRegion}.
@@ -226,7 +226,7 @@ const ScenarioLab = () => {
 
             {/* NATURAL-LANGUAGE SCENARIO BOX */}
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-[#0f4d23] uppercase tracking-[0.15em] flex items-center gap-1.5">
+              <label className="text-[10px] font-black text-[#1e1b2e] uppercase tracking-[0.15em] flex items-center gap-1.5">
                 <Sparkles size={12} /> Ask a Scenario
               </label>
               <div className="relative">
@@ -241,12 +241,12 @@ const ScenarioLab = () => {
                   }}
                   rows={2}
                   placeholder="e.g. What if the RBI hikes the repo rate by 200 bps and inflation jumps 4%?"
-                  className="w-full resize-none rounded-2xl border border-[#0f4d2320] bg-white px-4 py-3 pr-12 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0f4d2330] leading-relaxed"
+                  className="w-full resize-none rounded-2xl border border-[#1e1b2e20] bg-white px-4 py-3 pr-12 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1e1b2e30] leading-relaxed"
                 />
                 <button
                   onClick={handleAsk}
                   disabled={nlLoading || !nlQuery.trim()}
-                  className="absolute bottom-3 right-3 p-2 rounded-xl bg-[#0f4d23] text-white disabled:opacity-40 hover:bg-[#082d14] transition-colors"
+                  className="absolute bottom-3 right-3 p-2 rounded-xl bg-[#1e1b2e] text-white disabled:opacity-40 hover:bg-[#2a2740] transition-colors"
                   aria-label="Run natural-language scenario"
                 >
                   {nlLoading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
@@ -263,7 +263,7 @@ const ScenarioLab = () => {
                   <button
                     key={q}
                     onClick={() => setNlQuery(q)}
-                    className="text-[9px] font-semibold text-[#0f4d23] bg-[#0f4d230a] hover:bg-[#0f4d2315] border border-[#0f4d2315] px-2.5 py-1 rounded-full transition-colors"
+                    className="text-[9px] font-semibold text-[#1e1b2e] bg-[#1e1b2e0a] hover:bg-[#1e1b2e15] border border-[#1e1b2e15] px-2.5 py-1 rounded-full transition-colors"
                   >
                     {q}
                   </button>
@@ -277,9 +277,9 @@ const ScenarioLab = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 bg-[#0f4d2308] border border-[#0f4d2315] rounded-2xl"
+                  className="p-4 bg-[#1e1b2e08] border border-[#1e1b2e15] rounded-2xl"
                 >
-                  <div className="flex items-center gap-1.5 mb-2 text-[#0f4d23]">
+                  <div className="flex items-center gap-1.5 mb-2 text-[#1e1b2e]">
                     <Sparkles size={12} />
                     <span className="text-[9px] font-black uppercase tracking-widest">Engine Response</span>
                   </div>
@@ -289,9 +289,9 @@ const ScenarioLab = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="h-px flex-1 bg-[#0f4d2310]" />
+              <div className="h-px flex-1 bg-[#1e1b2e10]" />
               <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">or tune manually</span>
-              <div className="h-px flex-1 bg-[#0f4d2310]" />
+              <div className="h-px flex-1 bg-[#1e1b2e10]" />
             </div>
 
             {/* CONTROLS */}
@@ -299,7 +299,7 @@ const ScenarioLab = () => {
               {/* Interest Rate */}
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-[11px] font-bold text-[#0f4d23] uppercase tracking-tighter">Repo Rate Move</label>
+                  <label className="text-[11px] font-bold text-[#1e1b2e] uppercase tracking-tighter">Repo Rate Move</label>
                   <span className={`text-xs font-mono font-bold ${params.rate_change_bps >= 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                     {params.rate_change_bps > 0 ? '+' : ''}{params.rate_change_bps} BPS
                   </span>
@@ -308,14 +308,14 @@ const ScenarioLab = () => {
                   type="range" min="-500" max="1000" step="25"
                   value={params.rate_change_bps}
                   onChange={(e) => setParams(p => ({ ...p, rate_change_bps: parseInt(e.target.value) }))}
-                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#0f4d23]"
+                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#1e1b2e]"
                 />
               </div>
 
               {/* Inflation */}
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-[11px] font-bold text-[#0f4d23] uppercase tracking-tighter">Inflation Pulse</label>
+                  <label className="text-[11px] font-bold text-[#1e1b2e] uppercase tracking-tighter">Inflation Pulse</label>
                   <span className={`text-xs font-mono font-bold ${params.inflation_change_pct >= 0 ? 'text-red-500' : 'text-emerald-500'}`}>
                     {params.inflation_change_pct > 0 ? '+' : ''}{params.inflation_change_pct}%
                   </span>
@@ -324,14 +324,14 @@ const ScenarioLab = () => {
                   type="range" min="-5" max="20" step="1"
                   value={params.inflation_change_pct}
                   onChange={(e) => setParams(p => ({ ...p, inflation_change_pct: parseInt(e.target.value) }))}
-                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#0f4d23]"
+                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#1e1b2e]"
                 />
               </div>
 
               {/* GDP */}
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-[11px] font-bold text-[#0f4d23] uppercase tracking-tighter">GDP Shock (Demand)</label>
+                  <label className="text-[11px] font-bold text-[#1e1b2e] uppercase tracking-tighter">GDP Shock (Demand)</label>
                   <span className={`text-xs font-mono font-bold ${params.gdp_shock_pct < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                     {params.gdp_shock_pct > 0 ? '+' : ''}{params.gdp_shock_pct}%
                   </span>
@@ -340,7 +340,7 @@ const ScenarioLab = () => {
                   type="range" min="-10" max="10" step="1"
                   value={params.gdp_shock_pct}
                   onChange={(e) => setParams(p => ({ ...p, gdp_shock_pct: parseInt(e.target.value) }))}
-                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#0f4d23]"
+                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#1e1b2e]"
                 />
               </div>
             </div>
@@ -351,9 +351,9 @@ const ScenarioLab = () => {
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="space-y-4 pt-4 border-t border-[#0f4d2310]"
+                  className="space-y-4 pt-4 border-t border-[#1e1b2e10]"
                 >
-                  <div className="flex items-center gap-2 text-[#0f4d23]">
+                  <div className="flex items-center gap-2 text-[#1e1b2e]">
                     <TrendingUp size={16} />
                     <span className="text-[10px] font-bold uppercase tracking-wider">Simulation Output</span>
                   </div>
@@ -361,7 +361,7 @@ const ScenarioLab = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                       <p className="text-[8px] font-bold text-slate-400 uppercase mb-1">Base Case Scenario</p>
-                      <p className="text-sm font-bold text-[#0f4d23]">{fmtInr(result.p50)}</p>
+                      <p className="text-sm font-bold text-[#1e1b2e]">{fmtInr(result.p50)}</p>
                     </div>
                     <div className={`p-4 rounded-2xl border ${result.prob_below_current > 0.4 ? 'bg-red-50 border-red-100' : 'bg-emerald-50 border-emerald-100'}`}>
                       <p className={`text-[8px] font-bold uppercase mb-1 ${result.prob_below_current > 0.4 ? 'text-red-400' : 'text-emerald-400'}`}>Investment Safety</p>
@@ -379,7 +379,7 @@ const ScenarioLab = () => {
                   <button
                     onClick={handleDownloadReport}
                     disabled={downloading}
-                    className="w-full mt-2 py-3 bg-white border border-[#0f4d2320] text-[#0f4d23] rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors disabled:opacity-50"
+                    className="w-full mt-2 py-3 bg-white border border-[#1e1b2e20] text-[#1e1b2e] rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-50 transition-colors disabled:opacity-50"
                   >
                     {downloading ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
                     {downloading ? 'GENERATING REPORT...' : 'DOWNLOAD FULL PDF REPORT'}
@@ -390,11 +390,11 @@ const ScenarioLab = () => {
           </div>
 
           {/* FOOTER ACTION */}
-          <div className="p-6 bg-slate-50 border-t border-[#0f4d2310]">
+          <div className="p-6 bg-slate-50 border-t border-[#1e1b2e10]">
             <button
               onClick={handleRun}
               disabled={loading}
-              className="w-full py-4 bg-[#0f4d23] hover:bg-[#082d14] disabled:bg-slate-300 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]"
+              className="w-full py-4 bg-[#1e1b2e] hover:bg-[#2a2740] disabled:bg-slate-300 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]"
             >
               {loading ? (
                 <motion.div 

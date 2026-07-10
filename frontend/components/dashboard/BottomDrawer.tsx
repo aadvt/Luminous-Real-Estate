@@ -30,7 +30,7 @@ const BottomDrawer = () => {
     : 'At Risk'
 
   const stabilityColor = regionScore == null ? 'text-slate-400'
-    : regionScore < 30 ? 'text-[#0f4d23]'
+    : regionScore < 30 ? 'text-[#1e1b2e]'
     : regionScore < 60 ? 'text-amber-600'
     : 'text-red-500'
 
@@ -69,7 +69,7 @@ const BottomDrawer = () => {
     : 'At Risk'
 
   const stabilityColorFinal = displayScore == null ? 'text-slate-400'
-    : displayScore < 30 ? 'text-[#0f4d23]'
+    : displayScore < 30 ? 'text-[#1e1b2e]'
     : displayScore < 60 ? 'text-amber-600'
     : 'text-red-500'
 
@@ -81,29 +81,29 @@ const BottomDrawer = () => {
       initial={false}
       animate={{ height: isExpanded ? 540 : 100 }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] sm:w-[calc(100%-64px)] max-w-6xl max-h-[82vh] bg-white/90 backdrop-blur-3xl z-40 flex flex-col px-5 sm:px-10 py-4 sm:py-6 rounded-[28px] sm:rounded-[32px] shadow-[0_20px_80px_rgba(0,0,0,0.15)] border border-black/5 pointer-events-auto overflow-hidden"
+      className="fixed bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] sm:w-[calc(100%-64px)] max-w-6xl max-h-[82vh] bg-white/95 backdrop-blur-3xl z-40 flex flex-col px-5 sm:px-10 py-4 sm:py-6 rounded-[28px] sm:rounded-[32px] shadow-[0_6px_0_rgba(30,27,46,0.08),0_24px_60px_rgba(30,27,46,0.18)] border-2 border-[#1e1b2e1f] pointer-events-auto overflow-hidden"
     >
       {/* Top bar — always visible */}
       <div className="flex items-center justify-between border-b border-black/5 pb-4 mb-5 gap-4">
         <div className="flex items-center gap-5 sm:gap-10 overflow-x-auto no-scrollbar min-w-0">
-          <div className="flex flex-col">
-            <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase">Region Hub</span>
-            <span className="text-[14px] mt-0.5 font-extrabold text-[#0f4d23] tracking-tighter">{activeRegion}</span>
+          <div className="flex flex-col shrink-0">
+            <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase whitespace-nowrap">Region Hub</span>
+            <span className="text-[14px] mt-0.5 font-extrabold text-[#1e1b2e] tracking-tighter whitespace-nowrap">{activeRegion}</span>
           </div>
 
           <div className="h-8 w-px bg-black/5" />
 
-          <div className="flex flex-col">
-            <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase">Bubble Score</span>
-            <span className={`text-[14px] mt-0.5 font-extrabold tracking-tighter ${stabilityColorFinal}`}>
+          <div className="flex flex-col shrink-0">
+            <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase whitespace-nowrap">Bubble Score</span>
+            <span className={`text-[14px] mt-0.5 font-extrabold tracking-tighter whitespace-nowrap ${stabilityColorFinal}`}>
               {displayScore != null ? `${displayScore}/100 — ${stabilityLabelFinal}` : '—'}
             </span>
           </div>
 
           <div className="h-8 w-px bg-black/5" />
 
-          <div className="flex flex-col">
-            <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase">Official RESIDEX</span>
+          <div className="flex flex-col shrink-0">
+            <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase whitespace-nowrap">Official RESIDEX</span>
             <span className={`text-[14px] mt-0.5 font-extrabold tracking-tighter ${residex == null ? 'text-amber-500 animate-pulse' : 'text-black'}`}>
               {residex != null ? residex.toFixed(1) : 'Syncing...'}
             </span>
@@ -118,7 +118,7 @@ const BottomDrawer = () => {
               : backendStatus === 'loading' ? 'bg-amber-400 animate-pulse'
               : 'bg-red-400'
             }`} />
-            <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase">
+            <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase whitespace-nowrap">
               {backendStatus === 'connected' ? 'Agent Online' : backendStatus === 'loading' ? 'Syncing...' : 'Agent Offline'}
             </span>
           </div>
@@ -129,8 +129,8 @@ const BottomDrawer = () => {
             onClick={() => setIsExpanded(!isExpanded)}
             className={`flex items-center gap-2 px-3 sm:px-5 py-2 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all ${
               isExpanded
-              ? 'bg-[#0f4d23] text-white shadow-lg'
-              : 'bg-[#0f4d2310] text-[#0f4d23] hover:bg-[#0f4d2320]'
+              ? 'bg-[#1e1b2e] text-white shadow-lg'
+              : 'bg-[#1e1b2e10] text-[#1e1b2e] hover:bg-[#1e1b2e20]'
             }`}
           >
             <span className="hidden sm:inline">{isExpanded ? 'Hide Analytics' : 'Live Metrics'}</span>
@@ -200,7 +200,7 @@ const BottomDrawer = () => {
                    <div className="w-[140px] pl-6 border-l border-black/5 flex flex-col gap-4">
                       <div className="flex flex-col">
                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Local Yield</span>
-                        <span className="text-sm font-black text-[#0f4d23]">{yieldProxy.toFixed(2)}%</span>
+                        <span className="text-sm font-black text-[#1e1b2e]">{yieldProxy.toFixed(2)}%</span>
                       </div>
                       <div className="flex flex-col">
                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Risk Index</span>

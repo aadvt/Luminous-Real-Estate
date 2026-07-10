@@ -96,9 +96,9 @@ const ZoneInsights = () => {
 
             {/* Strategy Recommendation */}
             <div className="space-y-6">
-              <div className="p-6 bg-[#0f4d23]/5 rounded-3xl border border-[#0f4d23]/10 relative overflow-hidden group">
+              <div className="p-6 bg-[#1e1b2e]/5 rounded-3xl border border-[#1e1b2e]/10 relative overflow-hidden group">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-black text-[#0f4d23]/60 uppercase tracking-widest">
+                  <span className="text-[10px] font-black text-[#1e1b2e]/60 uppercase tracking-widest">
                     Recommendation
                   </span>
                   <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-100 shadow-sm`}>

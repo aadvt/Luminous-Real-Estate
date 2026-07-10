@@ -94,17 +94,17 @@ const RiskRadar = ({ data, score }: RiskRadarProps) => {
         .attr('alignment-baseline', 'middle')
         .attr('font-size', '11px')
         .attr('font-weight', '900')
-        .attr('fill', '#475569')
+        .attr('fill', '#5b5772')
         .attr('class', 'uppercase tracking-[0.2em]')
         .text(axis.name)
     })
 
     // Polygon Color based on score
     const getColor = () => {
-      if (score === null) return '#10b981'
-      if (score < 30) return '#10b981' // Emerald
-      if (score < 60) return '#d97706' // Amber
-      return '#ef4444' // Rose
+      if (score === null) return '#2fbf71'
+      if (score < 30) return '#2fbf71' // Mint
+      if (score < 60) return '#ffab2e' // Amber
+      return '#ff5050' // Coral
     }
 
     const mainColor = getColor()

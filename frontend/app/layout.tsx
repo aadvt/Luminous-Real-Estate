@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Manrope } from "next/font/google";
+import { Space_Grotesk, Manrope, Archivo_Black } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -12,9 +12,15 @@ const manrope = Manrope({
   subsets: ["latin"],
 });
 
+const archivoBlack = Archivo_Black({
+  variable: "--font-archivo",
+  weight: "400",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Luminous Real Estate Engine",
-  description: "Holographic Real Estate Dashboard",
+  title: "Luminous Atlas — India Real Estate Risk Map",
+  description: "A colorful 3D atlas of housing-bubble risk across Indian cities",
 };
 
 export default function RootLayout({
@@ -25,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${manrope.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${manrope.variable} ${archivoBlack.variable} h-full antialiased`}
     >
       <body className={`${manrope.className} min-h-full flex flex-col`}>{children}</body>
     </html>

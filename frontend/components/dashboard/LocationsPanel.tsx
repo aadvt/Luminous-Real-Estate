@@ -17,9 +17,9 @@ type SortKey = 'default' | 'price' | 'risk'
 
 const riskMeta = (score: number | null) => {
   if (score == null) return { label: 'Calibrating', color: '#94a3b8', bg: 'bg-slate-100', text: 'text-slate-500' }
-  if (score >= 65) return { label: 'At Risk', color: '#d7383b', bg: 'bg-rose-50', text: 'text-rose-600' }
-  if (score >= 35) return { label: 'Watch', color: '#E4B461', bg: 'bg-amber-50', text: 'text-amber-600' }
-  return { label: 'Stable', color: '#0f4d23', bg: 'bg-emerald-50', text: 'text-emerald-700' }
+  if (score >= 65) return { label: 'At Risk', color: '#ff5050', bg: 'bg-rose-50', text: 'text-rose-600' }
+  if (score >= 35) return { label: 'Watch', color: '#ffab2e', bg: 'bg-amber-50', text: 'text-amber-600' }
+  return { label: 'Stable', color: '#2fbf71', bg: 'bg-emerald-50', text: 'text-emerald-700' }
 }
 
 const LocationsPanel = () => {
@@ -68,18 +68,18 @@ const LocationsPanel = () => {
           exit={{ opacity: 0, y: 24 }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
           className="fixed z-[60] pointer-events-auto flex flex-col overflow-hidden
-                     bg-white/95 backdrop-blur-xl border border-[#0f4d2320] shadow-2xl
+                     bg-white/95 backdrop-blur-xl border-2 border-[#1e1b2e1f] shadow-[0_6px_0_rgba(30,27,46,0.08),0_24px_60px_rgba(30,27,46,0.18)]
                      inset-x-3 bottom-3 top-auto max-h-[72vh] rounded-3xl
                      sm:inset-x-auto sm:top-24 sm:right-6 sm:bottom-40 sm:w-[min(400px,92vw)]"
         >
           {/* HEADER */}
-          <div className="p-5 border-b border-[#0f4d2310] flex items-center justify-between bg-[#0f4d2305] shrink-0">
+          <div className="p-5 border-b border-[#1e1b2e10] flex items-center justify-between bg-[#1e1b2e05] shrink-0">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-[#0f4d23] text-yellow-400">
+              <div className="p-2 rounded-xl bg-[#1e1b2e] text-[#ffc845]">
                 <MapPin size={18} />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-[#0f4d23] font-headline uppercase tracking-tight">
+                <h2 className="text-sm font-bold text-[#1e1b2e] font-headline uppercase tracking-tight">
                   Locations &amp; Estimates
                 </h2>
                 <div className="flex items-center gap-1.5">
@@ -96,7 +96,7 @@ const LocationsPanel = () => {
             </div>
             <button
               onClick={() => setIsLocationsOpen(false)}
-              className="p-2 hover:bg-[#0f4d2310] rounded-full transition-colors text-slate-400 hover:text-[#0f4d23]"
+              className="p-2 hover:bg-[#1e1b2e10] rounded-full transition-colors text-slate-400 hover:text-[#1e1b2e]"
               aria-label="Close locations panel"
             >
               <X size={20} />
@@ -104,13 +104,13 @@ const LocationsPanel = () => {
           </div>
 
           {/* SORT BAR */}
-          <div className="px-5 py-3 flex items-center justify-between border-b border-[#0f4d2308] bg-white/60 shrink-0">
+          <div className="px-5 py-3 flex items-center justify-between border-b border-[#1e1b2e08] bg-white/60 shrink-0">
             <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">
               {rows.length} tracked cities · median home value
             </span>
             <button
               onClick={cycleSort}
-              className="flex items-center gap-1.5 text-[9px] font-bold text-[#0f4d23] uppercase tracking-wider bg-[#0f4d230a] hover:bg-[#0f4d2315] px-2.5 py-1 rounded-full transition-colors"
+              className="flex items-center gap-1.5 text-[9px] font-bold text-[#1e1b2e] uppercase tracking-wider bg-[#1e1b2e0a] hover:bg-[#1e1b2e15] px-2.5 py-1 rounded-full transition-colors"
             >
               <ArrowUpDown size={11} />
               {sortLabel}
@@ -130,8 +130,8 @@ const LocationsPanel = () => {
                   }}
                   className={`w-full text-left p-3.5 rounded-2xl border transition-all group ${
                     isActive
-                      ? 'bg-[#0f4d2308] border-[#0f4d2330] ring-1 ring-[#0f4d2320]'
-                      : 'bg-slate-50/60 border-black/5 hover:bg-[#0f4d2305] hover:border-[#0f4d2320]'
+                      ? 'bg-[#1e1b2e08] border-[#1e1b2e30] ring-1 ring-[#1e1b2e20]'
+                      : 'bg-slate-50/60 border-black/5 hover:bg-[#1e1b2e05] hover:border-[#1e1b2e20]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -149,7 +149,7 @@ const LocationsPanel = () => {
                       </span>
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="text-base font-black text-[#0f4d23] tracking-tighter leading-none">
+                      <div className="text-base font-black text-[#1e1b2e] tracking-tighter leading-none">
                         {fmtLakh(priceLakh)}
                       </div>
                       <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
@@ -177,7 +177,7 @@ const LocationsPanel = () => {
           </div>
 
           {/* FOOTER NOTE */}
-          <div className="px-5 py-3 border-t border-[#0f4d2308] bg-white/60 shrink-0">
+          <div className="px-5 py-3 border-t border-[#1e1b2e08] bg-white/60 shrink-0">
             <p className="text-[8px] leading-relaxed text-slate-400 font-medium">
               Estimates derive median home value from NHB RESIDEX indices
               (index&nbsp;×&nbsp;0.48&nbsp;lakh). Live values stream from the engine; fallbacks

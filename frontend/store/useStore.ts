@@ -152,7 +152,7 @@ export const useStore = create<DashboardState>((set) => ({
   setIsTracing: (tracing) => set({ isTracing: tracing }),
 
   // Data Ingestion Pipeline Sidebar
-  isPipelineOpen: true, // Default open to showcase the pipeline data scraper logs
+  isPipelineOpen: false, // Collapsed by default so the map stays the hero; opens from the left-edge tab
   setIsPipelineOpen: (open) => set({ isPipelineOpen: open }),
 
   // Locations & Estimates panel

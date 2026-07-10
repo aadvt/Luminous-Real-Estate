@@ -58,7 +58,7 @@ const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
   const riskScore = liveBubble?.overall_score ?? 0
   const riskLabel = riskScore < 30 ? 'Safe' : riskScore < 60 ? 'Moderate' : 'High Risk'
   const riskWidth = `${Math.min(riskScore, 100)}%`
-  const riskColor = riskScore < 30 ? '#0f4d23' : riskScore < 60 ? '#E4B461' : '#d7383b'
+  const riskColor = riskScore < 30 ? '#2fbf71' : riskScore < 60 ? '#ffab2e' : '#ff5050'
 
   return (
     <AnimatePresence>
@@ -68,14 +68,14 @@ const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-          className="fixed right-0 top-0 h-full w-[min(400px,100vw)] bg-[#ffffff] border-l border-black/5 z-[60] flex flex-col shadow-[-30px_0_70px_rgba(15,77,35,0.15)] pointer-events-auto"
+          className="fixed right-0 top-0 h-full w-[min(400px,100vw)] bg-[#ffffff] border-l-2 border-ink/10 z-[60] flex flex-col shadow-[-30px_0_70px_rgba(30,27,46,0.2)] pointer-events-auto"
         >
           {/* Header */}
           <div className="p-6 sm:p-10 border-b border-black/5 bg-white/50">
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h2 className="text-2xl font-headline font-bold text-black tracking-tighter">{selectedAssetId || 'Asset'}</h2>
-                <p className="text-[10px] text-[#0f4d23] font-bold font-headline tracking-widest uppercase mt-1.5">
+                <p className="text-[10px] text-[#1e1b2e] font-bold font-headline tracking-widest uppercase mt-1.5">
                   {liveBubble?.region || 'BKC'} • {liveValuation?.region || 'India'}
                 </p>
               </div>
@@ -117,7 +117,7 @@ const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
                   <TrendingUp size={12} />
                   <span className="text-[9px] font-bold uppercase tracking-widest">Cap Rate</span>
                 </div>
-                <div className="text-lg font-headline font-bold text-[#0f4d23]">
+                <div className="text-lg font-headline font-bold text-[#1e1b2e]">
                   {liveValuation?.cap_rate ? `${liveValuation.cap_rate.toFixed(1)}%` : '—'}
                 </div>
               </div>
@@ -198,7 +198,7 @@ const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
                 }
               }}
               disabled={loading}
-              className="w-full bg-[#0f4d23] text-white py-4 rounded-2xl font-headline font-bold text-xs tracking-[0.3em] uppercase transition-all shadow-lg shadow-[#0f4d2340] hover:shadow-xl hover:shadow-[#0f4d2350] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-wait flex items-center justify-center gap-3"
+              className="w-full bg-[#1e1b2e] text-white py-4 rounded-2xl font-headline font-bold text-xs tracking-[0.3em] uppercase transition-all shadow-lg shadow-[#1e1b2e40] hover:shadow-xl hover:shadow-[#1e1b2e50] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-wait flex items-center justify-center gap-3"
             >
               {loading ? <><Loader2 size={14} className="animate-spin" /> Running Analysis...</> : 'Run Analytics'}
             </button>

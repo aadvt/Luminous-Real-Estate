@@ -128,10 +128,10 @@ export const MarketQuadrant = ({ activeCity, activeRisk, activeYield }: MarketQu
 
     // Quadrant Labels - Repositioned to outer corners
     const labels = [
-      { x: 18, y: 8.5, text: 'Growth', color: '#10b981' },
-      { x: 82, y: 8.5, text: 'Hot Market', color: '#f59e0b' },
-      { x: 18, y: 1.5, text: 'Safe Harbor', color: '#6366f1' },
-      { x: 82, y: 1.5, text: 'Overpriced', color: '#ef4444' }
+      { x: 18, y: 8.5, text: 'Growth', color: '#2fbf71' },
+      { x: 82, y: 8.5, text: 'Hot Market', color: '#ffab2e' },
+      { x: 18, y: 1.5, text: 'Safe Harbor', color: '#7b61ff' },
+      { x: 82, y: 1.5, text: 'Overpriced', color: '#ff5050' }
     ]
 
     labels.forEach(l => {
@@ -176,7 +176,7 @@ export const MarketQuadrant = ({ activeCity, activeRisk, activeYield }: MarketQu
         .attr('cx', px)
         .attr('cy', py)
         .attr('r', 12)
-        .attr('fill', '#0f4d23')
+        .attr('fill', '#7b61ff')
         .attr('opacity', 0.15)
         .attr('class', 'animate-pulse')
 
@@ -185,7 +185,7 @@ export const MarketQuadrant = ({ activeCity, activeRisk, activeYield }: MarketQu
         .attr('cx', px)
         .attr('cy', py)
         .attr('r', 6)
-        .attr('fill', '#0f4d23')
+        .attr('fill', '#7b61ff')
         .attr('stroke', 'white')
         .attr('stroke-width', 2.5)
         .attr('class', 'shadow-xl')
@@ -219,7 +219,7 @@ export const MarketQuadrant = ({ activeCity, activeRisk, activeYield }: MarketQu
     <div className="relative group/quad w-full h-full flex items-center justify-center">
       <svg ref={svgRef} viewBox="0 0 350 260" className="w-full h-full max-h-[220px] overflow-visible" />
       <div className="absolute top-0 right-0 p-2 opacity-0 group-hover/quad:opacity-100 transition-opacity">
-        <span className="text-[7px] font-black text-[#0f4d23] bg-[#0f4d2310] px-1.5 py-0.5 rounded-full uppercase">
+        <span className="text-[7px] font-black text-[#1e1b2e] bg-[#1e1b2e10] px-1.5 py-0.5 rounded-full uppercase">
           {activeCity}
         </span>
       </div>

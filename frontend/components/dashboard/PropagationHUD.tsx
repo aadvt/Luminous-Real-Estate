@@ -18,7 +18,6 @@ const PropagationHUD = () => {
       const interval = setInterval(() => {
         if (i < propagationSteps.length) {
           setVisibleSteps(prev => [...prev, propagationSteps[i]])
-          // Play a subtle sound effect here if implemented
           i++
         } else {
           clearInterval(interval)
@@ -48,21 +47,21 @@ const PropagationHUD = () => {
                      sm:left-8 sm:top-1/4 sm:w-80"
         >
           {/* HUD Header */}
-          <div className="bg-black/80 backdrop-blur-xl border-l-4 border-emerald-500 p-4 rounded-tr-2xl shadow-2xl flex items-center justify-between">
+          <div className="bg-[#1e1b2e]/95 backdrop-blur-xl border-l-4 border-[#ffc845] p-4 rounded-tr-2xl shadow-2xl flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Terminal size={14} className="text-emerald-400 animate-pulse" />
+              <Terminal size={14} className="text-[#ffc845] animate-pulse" />
               <div className="flex flex-col">
-                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Logic Propagation</span>
-                <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter">MC-ENGINE TRACE // LIVE</span>
+                <span className="text-[10px] font-black text-[#ffc845] uppercase tracking-widest">Logic Propagation</span>
+                <span className="text-[8px] text-white/40 font-bold uppercase tracking-tighter">MC-ENGINE TRACE // LIVE</span>
               </div>
             </div>
-            <Activity size={14} className="text-emerald-900" />
+            <Activity size={14} className="text-[#ffc845]/40" />
           </div>
 
           {/* Terminal Body */}
-          <div 
+          <div
             ref={scrollRef}
-            className="flex-1 overflow-y-auto bg-black/60 backdrop-blur-md border-l-4 border-emerald-500/30 p-4 space-y-3 scrollbar-hide font-mono shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]"
+            className="flex-1 overflow-y-auto bg-[#1e1b2e]/85 backdrop-blur-md border-l-4 border-[#ffc845]/30 p-4 space-y-3 scrollbar-hide font-mono shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]"
           >
             {visibleSteps.map((step, idx) => (
               <motion.div
@@ -72,39 +71,34 @@ const PropagationHUD = () => {
                 className="flex gap-2"
               >
                 <div className="mt-1">
-                  <ChevronRight size={10} className="text-emerald-500" />
+                  <ChevronRight size={10} className="text-[#ffc845]" />
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-[11px] text-emerald-200/90 leading-relaxed font-bold lowercase tracking-wide">
+                  <p className="text-[11px] text-[#f5f1e8]/90 leading-relaxed font-bold lowercase tracking-wide">
                     {step}
                   </p>
-                  <div className="h-px w-full bg-emerald-500/10 mt-1" />
+                  <div className="h-px w-full bg-white/10 mt-1" />
                 </div>
               </motion.div>
             ))}
 
             {visibleSteps.length < propagationSteps.length && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/5 rounded-lg border border-emerald-500/10">
-                <Binary size={10} className="text-emerald-500 animate-spin" />
-                <span className="text-[9px] text-emerald-500/60 font-black uppercase tracking-widest">Processing Determinants...</span>
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-lg border border-white/10">
+                <Binary size={10} className="text-[#ffc845] animate-spin" />
+                <span className="text-[9px] text-[#ffc845]/60 font-black uppercase tracking-widest">Processing Determinants...</span>
               </div>
             )}
           </div>
 
           {/* HUD Footer - Signal bars */}
-          <div className="bg-black/80 backdrop-blur-md p-2 rounded-br-2xl border-l-4 border-emerald-500/50 flex justify-end gap-1">
+          <div className="bg-[#1e1b2e]/95 backdrop-blur-md p-2 rounded-br-2xl border-l-4 border-[#ffc845]/50 flex justify-end gap-1">
             {[1, 2, 3, 4, 5].map(i => (
-              <div 
-                key={i} 
-                className="w-1 bg-emerald-500/20 rounded-full h-2"
+              <div
+                key={i}
+                className="w-1 bg-[#ffc845]/40 rounded-full h-2"
                 style={{ height: `${i * 2 + 2}px`, opacity: 0.2 + (i * 0.15)}}
               />
             ))}
-          </div>
-          
-          {/* Scanline Effect Overlay */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10 rounded-2xl">
-            <div className="w-full h-full bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
           </div>
         </motion.div>
       )}
