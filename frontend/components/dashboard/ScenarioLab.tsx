@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Play, Zap, Info, TrendingUp, AlertTriangle, FileText, Loader2 } from 'lucide-react'
+import { X, Play, Zap, Info, TrendingUp, AlertTriangle, FileText, Loader2, Send, Sparkles } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { api } from '@/lib/apiClient'
+import type { QueryResult } from '@/lib/apiClient'
 
 const ScenarioLab = () => {
   const { 
@@ -24,6 +25,42 @@ const ScenarioLab = () => {
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [result, setResult] = useState<any>(null)
+
+  // Natural-language "what if" query state
+  const [nlQuery, setNlQuery] = useState('')
+  const [nlLoading, setNlLoading] = useState(false)
+  const [nlAnswer, setNlAnswer] = useState<string | null>(null)
+  const [nlError, setNlError] = useState<string | null>(null)
+
+  const handleAsk = async () => {
+    const question = nlQuery.trim()
+    if (!question || nlLoading) return
+    setNlLoading(true)
+    setNlAnswer(null)
+    setNlError(null)
+    try {
+      const data = await api<QueryResult>('/api/query', {
+        method: 'POST',
+        body: JSON.stringify({ question, region: activeRegion }),
+      })
+      setNlAnswer(data.answer || 'No answer returned by the engine.')
+
+      // If the engine interpreted this as a simulation, surface the distribution
+      if (data.mc_results) {
+        const mc = data.mc_results
+        setResult({ ...mc, narrative: data.answer })
+        if (mc.propagation_trace?.length) {
+          setPropagationSteps(mc.propagation_trace)
+          setIsTracing(true)
+        }
+      }
+    } catch (err: any) {
+      console.error('NL query failed:', err)
+      setNlError('Engine unreachable — natural-language scenarios need the live backend.')
+    } finally {
+      setNlLoading(false)
+    }
+  }
 
   const handleRun = async () => {
     setLoading(true)
@@ -150,11 +187,13 @@ const ScenarioLab = () => {
     <AnimatePresence>
       {isScenarioLabOpen && (
         <motion.div
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 24 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed top-24 right-6 bottom-40 w-[420px] bg-white/95 backdrop-blur-xl border border-[#0f4d2320] rounded-3xl z-[60] shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+          className="fixed z-[60] bg-white/95 backdrop-blur-xl border border-[#0f4d2320] shadow-2xl flex flex-col overflow-hidden pointer-events-auto
+                     inset-x-3 bottom-3 top-auto max-h-[85vh] rounded-3xl
+                     sm:inset-x-auto sm:top-24 sm:right-6 sm:bottom-40 sm:w-[420px] sm:max-h-none"
         >
           {/* HEADER */}
           <div className="p-6 border-b border-[#0f4d2310] flex items-center justify-between bg-[#0f4d2305]">
@@ -180,8 +219,79 @@ const ScenarioLab = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex gap-3 italic">
               <Info size={16} className="text-[#0f4d23] mt-1 shrink-0" />
               <p className="text-xs text-slate-600 leading-relaxed font-body">
-                Modify macro-economic variables to observe direct probabilistic impact on urban real estate valuations. 10k simulations per run.
+                Ask a &ldquo;what if&rdquo; in plain English, or fine-tune the macro sliders below.
+                Each run executes 10k Monte Carlo simulations on {activeRegion}.
               </p>
+            </div>
+
+            {/* NATURAL-LANGUAGE SCENARIO BOX */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-[#0f4d23] uppercase tracking-[0.15em] flex items-center gap-1.5">
+                <Sparkles size={12} /> Ask a Scenario
+              </label>
+              <div className="relative">
+                <textarea
+                  value={nlQuery}
+                  onChange={(e) => setNlQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      handleAsk()
+                    }
+                  }}
+                  rows={2}
+                  placeholder="e.g. What if the RBI hikes the repo rate by 200 bps and inflation jumps 4%?"
+                  className="w-full resize-none rounded-2xl border border-[#0f4d2320] bg-white px-4 py-3 pr-12 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0f4d2330] leading-relaxed"
+                />
+                <button
+                  onClick={handleAsk}
+                  disabled={nlLoading || !nlQuery.trim()}
+                  className="absolute bottom-3 right-3 p-2 rounded-xl bg-[#0f4d23] text-white disabled:opacity-40 hover:bg-[#082d14] transition-colors"
+                  aria-label="Run natural-language scenario"
+                >
+                  {nlLoading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                </button>
+              </div>
+
+              {/* Quick-prompt chips */}
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  'What if repo rate rises 250 bps?',
+                  'Impact of 5% inflation spike?',
+                  'IT sector slowdown, GDP -3%?',
+                ].map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => setNlQuery(q)}
+                    className="text-[9px] font-semibold text-[#0f4d23] bg-[#0f4d230a] hover:bg-[#0f4d2315] border border-[#0f4d2315] px-2.5 py-1 rounded-full transition-colors"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+
+              {nlError && (
+                <p className="text-[10px] text-rose-500 font-medium px-1">{nlError}</p>
+              )}
+              {nlAnswer && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-[#0f4d2308] border border-[#0f4d2315] rounded-2xl"
+                >
+                  <div className="flex items-center gap-1.5 mb-2 text-[#0f4d23]">
+                    <Sparkles size={12} />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Engine Response</span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed">{nlAnswer}</p>
+                </motion.div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#0f4d2310]" />
+              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">or tune manually</span>
+              <div className="h-px flex-1 bg-[#0f4d2310]" />
             </div>
 
             {/* CONTROLS */}

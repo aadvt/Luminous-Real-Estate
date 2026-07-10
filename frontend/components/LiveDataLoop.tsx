@@ -4,31 +4,38 @@ import { useEffect, useRef } from 'react'
 import { useStore } from '@/store/useStore'
 import { api, apiUrl } from '@/lib/apiClient'
 import type { MacroSnapshot, BubbleFlag, ValuationRecord } from '@/lib/apiClient'
+import { CITIES, CITY_BY_KEY, priceInrFor, resolveCityKey, ASSET_COORDS } from '@/lib/cityData'
+
+export { ASSET_COORDS }
 
 const POLL_INTERVAL = 30_000 // 30 seconds
 
-// All 8 cities tracked by the engine, mapped to their canonical asset IDs
-const CITY_TO_ASSET: Record<string, string> = {
-  'mumbai':    'MUM-BKC',
-  'delhi':     'DEL-CP',
-  'bangalore': 'BLR-WF',
-  'chennai':   'MAA-OMR',
-  'hyderabad': 'HYD-HIT',
-  'kolkata':   'KOL-NEW',
-  'pune':      'PUN-HIN',
-  'ahmedabad': 'AHM-GIFT',
+// Map every tracked city's live bubble flag into the shared valuationMap.
+const applyFlags = (
+  flags: BubbleFlag[],
+  setValuation: (id: string, data: Record<string, number>) => void,
+) => {
+  flags.forEach((flag) => {
+    const key = resolveCityKey(flag.region)
+    const city = key ? CITY_BY_KEY[key] : null
+    if (city) {
+      setValuation(city.assetId, {
+        // Keep risk_score on a 0-10 scale for marker threshold logic (>7=red, >4=yellow)
+        risk_score: flag.overall_score / 10,
+        pi_ratio: flag.price_income_ratio ?? 0,
+      })
+    }
+  })
 }
 
-// Canonical coordinates for each asset (must match MapboxReality)
-export const ASSET_COORDS: Record<string, [number, number]> = {
-  'MUM-BKC':  [72.8656, 19.0658],
-  'DEL-CP':   [77.2090, 28.6139],
-  'BLR-WF':   [77.5946, 12.9716],
-  'MAA-OMR':  [80.2707, 13.0827],
-  'HYD-HIT':  [78.3725, 17.4478],
-  'KOL-NEW':  [88.4651, 22.5892],
-  'PUN-HIN':  [73.7334, 18.5913],
-  'AHM-GIFT': [72.6841, 23.1610],
+// Push RESIDEX-derived price estimates into each city marker (real, not random).
+const applyPrices = (
+  snapshot: MacroSnapshot | null,
+  setValuation: (id: string, data: Record<string, number>) => void,
+) => {
+  CITIES.forEach((city) => {
+    setValuation(city.assetId, { price_index: priceInrFor(snapshot, city) })
+  })
 }
 
 const LiveDataLoop = () => {
@@ -58,31 +65,23 @@ const LiveDataLoop = () => {
         await api('/health')
         if (!cancelled) setBackendStatus('connected')
 
-        // 2. Macro snapshot
+        // 2. Macro snapshot → drives real per-city cost estimates
         try {
           const macro = await api<MacroSnapshot>('/api/market/snapshot')
-          if (!cancelled) setMacroSnapshot(macro)
+          if (!cancelled) {
+            setMacroSnapshot(macro)
+            applyPrices(macro, setValuation)
+          }
         } catch (e) {
           console.warn('[LiveData] macro snapshot failed:', e)
         }
 
-        // 3. Bubble flags → populate valuationMap with real data for all 8 cities
+        // 3. Bubble flags → populate valuationMap with real risk data for all 8 cities
         try {
           const flags = await api<BubbleFlag[]>('/api/risk/bubble-flags')
           if (!cancelled) {
             setBubbleFlags(flags)
-            // Map each city's bubble flag into the valuationMap using raw 0-100 scores
-            flags.forEach((flag) => {
-              const key = flag.region.toLowerCase().replace(/[ -]/g, '_')
-              const assetId = CITY_TO_ASSET[key] ?? CITY_TO_ASSET[flag.region.toLowerCase()]
-              if (assetId) {
-                setValuation(assetId, {
-                  // Keep risk_score on a 0-10 scale for marker threshold logic (>7=red, >4=yellow)
-                  risk_score: flag.overall_score / 10,
-                  pi_ratio: flag.price_income_ratio ?? 0,
-                })
-              }
-            })
+            applyFlags(flags, setValuation)
           }
         } catch (e) {
           console.warn('[LiveData] bubble flags failed:', e)
@@ -117,13 +116,14 @@ const LiveDataLoop = () => {
       }
     }
 
-    // Seed all 8 asset markers with defaults so they appear immediately on map load
-    Object.entries(ASSET_COORDS).forEach(([id]) => {
-      setValuation(id, {
-        price_index: 450000 + Math.random() * 550000,
-        risk_score: 5.0 + Math.random() * 2, // neutral 50/100 = 5.0 on 0-10 scale
-        volatility: Math.random() * 0.3,
-        pi_ratio: 8 + Math.random() * 6,
+    // Seed all 8 markers immediately with RESIDEX-fallback prices (real calibration,
+    // not random) + a neutral risk score, so the map is populated before the API replies.
+    CITIES.forEach((city) => {
+      setValuation(city.assetId, {
+        price_index: priceInrFor(null, city),
+        risk_score: 5.0, // neutral 50/100 until the engine reports
+        volatility: 0,
+        pi_ratio: 0,
       })
     })
 
@@ -164,20 +164,11 @@ const LiveDataLoop = () => {
           if (data.type === 'bubble_alert' || data.type === 'valuation_complete') {
             Promise.all([
               api<BubbleFlag[]>('/api/risk/bubble-flags'),
-              api<any[]>('/api/valuations'),
+              api<ValuationRecord[]>('/api/valuations'),
             ]).then(([flags, vals]) => {
               setBubbleFlags(flags)
-              // Re-map flags to valuationMap
-              flags.forEach((flag) => {
-                const key = flag.region.toLowerCase().replace(/[ -]/g, '_')
-                const assetId = CITY_TO_ASSET[key] ?? CITY_TO_ASSET[flag.region.toLowerCase()]
-                if (assetId) {
-                  setValuation(assetId, {
-                    risk_score: flag.overall_score / 10,
-                    pi_ratio: flag.price_income_ratio ?? 0,
-                  })
-                }
-              })
+              setValuations(vals)
+              applyFlags(flags, setValuation)
             }).catch(() => {})
           }
         } catch {
@@ -200,7 +191,7 @@ const LiveDataLoop = () => {
       clearTimeout(timeoutHandle)
       sseRef.current?.close()
     }
-  }, [setBubbleFlags, setValuation])
+  }, [setBubbleFlags, setValuation, setValuations])
 
 
 

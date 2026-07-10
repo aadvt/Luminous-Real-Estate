@@ -84,16 +84,26 @@ interface DashboardState {
   isPipelineOpen: boolean
   setIsPipelineOpen: (open: boolean) => void
 
+  // Locations & Estimates panel
+  isLocationsOpen: boolean
+  setIsLocationsOpen: (open: boolean) => void
+
   // New: Zone Selection
   selectedZone: ZoneData | null
   setSelectedZone: (zone: ZoneData | null) => void
+
+  // Closes every right-hand panel (used to keep them mutually exclusive)
+  closeRightPanels: () => void
 }
 
 export const useStore = create<DashboardState>((set) => ({
   // Pipeline 1
   valuationMap: {},
   selectedAssetId: null,
-  setSelectedAssetId: (id) => set({ selectedAssetId: id }),
+  // Opening the property panel closes the other right-hand panels
+  setSelectedAssetId: (id) => set(id
+    ? { selectedAssetId: id, selectedZone: null, isScenarioLabOpen: false, isLocationsOpen: false }
+    : { selectedAssetId: null }),
 
   // Map navigation
   activeRegion: 'Mumbai',
@@ -130,7 +140,9 @@ export const useStore = create<DashboardState>((set) => ({
   scenarioResult: null,
   setScenarioResult: (result) => set({ scenarioResult: result }),
   isScenarioLabOpen: false,
-  setIsScenarioLabOpen: (open) => set({ isScenarioLabOpen: open }),
+  setIsScenarioLabOpen: (open) => set(open
+    ? { isScenarioLabOpen: true, selectedAssetId: null, selectedZone: null, isLocationsOpen: false }
+    : { isScenarioLabOpen: false }),
 
   // Propagation Trace
   propagationSteps: [],
@@ -143,7 +155,22 @@ export const useStore = create<DashboardState>((set) => ({
   isPipelineOpen: true, // Default open to showcase the pipeline data scraper logs
   setIsPipelineOpen: (open) => set({ isPipelineOpen: open }),
 
-  // Zone Selection
+  // Locations & Estimates panel
+  isLocationsOpen: false,
+  setIsLocationsOpen: (open) => set(open
+    ? { isLocationsOpen: true, selectedAssetId: null, selectedZone: null, isScenarioLabOpen: false }
+    : { isLocationsOpen: false }),
+
+  // Zone Selection — opening a zone closes the other right-hand panels
   selectedZone: null,
-  setSelectedZone: (zone) => set({ selectedZone: zone }),
+  setSelectedZone: (zone) => set(zone
+    ? { selectedZone: zone, selectedAssetId: null, isScenarioLabOpen: false, isLocationsOpen: false }
+    : { selectedZone: null }),
+
+  closeRightPanels: () => set({
+    selectedAssetId: null,
+    selectedZone: null,
+    isScenarioLabOpen: false,
+    isLocationsOpen: false,
+  }),
 }))

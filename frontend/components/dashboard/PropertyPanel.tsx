@@ -6,12 +6,17 @@ import { X, TrendingUp, BarChart3, History, Loader2, Shield } from 'lucide-react
 import { useStore } from '@/store/useStore'
 import { api } from '@/lib/apiClient'
 import type { ValuationRecord, BubbleFlag } from '@/lib/apiClient'
+import { CITY_BY_ASSET, priceInrFor } from '@/lib/cityData'
 
 const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
-  const { selectedAssetId, valuations, bubbleFlags } = useStore()
+  const { selectedAssetId, valuations, bubbleFlags, macroSnapshot } = useStore()
   const [loading, setLoading] = useState(false)
   const [liveValuation, setLiveValuation] = useState<ValuationRecord | null>(null)
   const [liveBubble, setLiveBubble] = useState<BubbleFlag | null>(null)
+
+  const city = selectedAssetId ? CITY_BY_ASSET[selectedAssetId] : null
+  // RESIDEX-derived estimate — always a real number, even when the backend is down
+  const estimatedInr = city ? priceInrFor(macroSnapshot, city) : null
 
   // Fetch fresh data when a building is selected
   useEffect(() => {
@@ -19,14 +24,8 @@ const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
 
     setLoading(true)
 
-    // Try to find matching data from the store first, then fetch fresh
-    const regionMap: Record<string, string> = {
-      'MUM-BKC': 'mumbai',
-      'DEL-CP': 'delhi',
-      'BLR-WF': 'bangalore',
-      'MAA-OMR': 'chennai',
-    }
-    const region = regionMap[selectedAssetId] || 'national'
+    // Resolve the region for this asset across all tracked cities
+    const region = CITY_BY_ASSET[selectedAssetId]?.key || 'national'
 
     // Use cached valuations from store
     const cached = valuations.find(v => v.region?.toLowerCase() === region)
@@ -69,10 +68,10 @@ const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-          className="fixed right-0 top-0 h-full w-[400px] bg-[#ffffff] border-l border-black/5 z-[60] flex flex-col shadow-[-30px_0_70px_rgba(15, 77, 35,0.15)] pointer-events-auto"
+          className="fixed right-0 top-0 h-full w-[min(400px,100vw)] bg-[#ffffff] border-l border-black/5 z-[60] flex flex-col shadow-[-30px_0_70px_rgba(15,77,35,0.15)] pointer-events-auto"
         >
           {/* Header */}
-          <div className="p-10 border-b border-black/5 bg-white/50">
+          <div className="p-6 sm:p-10 border-b border-black/5 bg-white/50">
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h2 className="text-2xl font-headline font-bold text-black tracking-tighter">{selectedAssetId || 'Asset'}</h2>
@@ -98,17 +97,19 @@ const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
               <div className="absolute inset-0 bg-gradient-to-t from-white/60 to-transparent" />
               <div className="absolute bottom-6 left-8">
                 <div className="text-black font-headline text-2xl font-bold tracking-tighter">
-                  {loading ? <Loader2 size={20} className="animate-spin" /> : fmtInr(liveValuation?.property_value || liveValuation?.dcf_value)}
+                  {loading
+                    ? <Loader2 size={20} className="animate-spin" />
+                    : fmtInr(liveValuation?.property_value || liveValuation?.dcf_value || estimatedInr)}
                 </div>
                 <div className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.1em]">
-                  {liveValuation ? 'Current Valuation' : 'Awaiting Data'}
+                  {liveValuation ? 'Current Valuation' : 'Est. Median · NHB RESIDEX'}
                 </div>
               </div>
             </div>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto no-scrollbar p-10 pt-8 space-y-12">
+          <div className="flex-1 overflow-y-auto no-scrollbar p-6 sm:p-10 sm:pt-8 space-y-10 sm:space-y-12">
             {/* Rapid Stats Grid */}
             <div className="grid grid-cols-2 gap-6">
               <div className="p-5 rounded-2xl bg-black/[0.02] border border-black/5 space-y-1">
@@ -177,7 +178,7 @@ const PropertyPanel = ({ isOpen = true, onClose = () => {} }: any) => {
           </div>
 
           {/* Action Footer */}
-          <div className="p-10 mt-auto border-t border-black/5 bg-white">
+          <div className="p-6 sm:p-10 mt-auto border-t border-black/5 bg-white">
             <button 
               onClick={async () => {
                 setLoading(true)

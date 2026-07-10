@@ -27,6 +27,15 @@ const DataPipelineSidebar = () => {
   const [logs, setLogs] = useState<string[]>([])
   const terminalEndRef = useRef<HTMLDivElement>(null)
 
+  // On small screens the sidebar would cover the map, so start collapsed there.
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      setIsPipelineOpen(false)
+    }
+    // run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Calculate last and next scheduled runs
   const snapshotDate = macroSnapshot?.snapshot_at 
     ? new Date(macroSnapshot.snapshot_at) 
@@ -117,9 +126,11 @@ const DataPipelineSidebar = () => {
       {/* FULL SIDEBAR */}
       <motion.div
         initial={false}
-        animate={{ x: isPipelineOpen ? 0 : -420 }}
+        animate={{ x: isPipelineOpen ? 0 : -460 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="fixed top-24 left-6 bottom-40 w-[380px] bg-white/95 backdrop-blur-xl border border-[#0f4d2320] rounded-3xl z-[60] shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+        className="fixed z-[60] bg-white/95 backdrop-blur-xl border border-[#0f4d2320] rounded-3xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto
+                   top-20 left-3 bottom-28 w-[min(380px,92vw)]
+                   sm:top-24 sm:left-6 sm:bottom-40 sm:w-[380px]"
       >
         {/* HEADER */}
         <div className="p-5 border-b border-[#0f4d2310] flex items-center justify-between bg-[#0f4d2305]">

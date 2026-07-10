@@ -42,6 +42,10 @@ export interface MacroSnapshot {
   nhb_residex_delhi: number | null
   nhb_residex_bangalore: number | null
   nhb_residex_chennai: number | null
+  nhb_residex_hyderabad: number | null
+  nhb_residex_kolkata: number | null
+  nhb_residex_pune: number | null
+  nhb_residex_ahmedabad: number | null
   median_home_price_inr: number | null
   median_household_income_inr: number | null
   snapshot_at: string
@@ -91,8 +95,23 @@ export interface HealthDetail {
   checks: Record<string, string>
 }
 
+export interface MonteCarloResult {
+  p5: number
+  p10: number
+  p25: number
+  p50: number
+  p75: number
+  p90: number
+  p95: number
+  prob_below_current: number
+  var_95: number
+  n_simulations: number
+  propagation_trace: string[]
+}
+
 export interface QueryResult {
   answer: string | null
   run_id: string | null
+  mc_results?: MonteCarloResult | null
   errors: string[]
 }

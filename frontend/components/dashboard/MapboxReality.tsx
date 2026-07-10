@@ -6,7 +6,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import * as THREE from 'three'
 import { useStore, ZoneData } from '@/store/useStore'
 import { findZoneByCoordinates } from '@/lib/zoneData'
-import { ASSET_COORDS } from '@/components/LiveDataLoop'
+import { ASSET_COORDS, CITY_BY_ASSET, fmtInr } from '@/lib/cityData'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || ''
 
@@ -552,16 +552,17 @@ const MapboxReality = () => {
         const liveRisk = live?.risk_score ?? 5
         const liveColor = liveRisk > 7 ? '#d7383b' : liveRisk > 4 ? '#E4B461' : '#4dbf73'
         const liveScore = (liveRisk * 10).toFixed(0)
-        const livePir = live?.pi_ratio?.toFixed(1) ?? 'N/A'
-        const livePrice = live?.price_index ? `₹${(live.price_index / 100000).toFixed(1)}L` : 'N/A'
+        const livePir = live?.pi_ratio && live.pi_ratio > 0 ? `${live.pi_ratio.toFixed(1)}x` : 'N/A'
+        const livePrice = live?.price_index ? fmtInr(live.price_index) : 'N/A'
+        const cityLabel = CITY_BY_ASSET[id]?.label ?? id
         popup.setHTML(`
-          <div style="background: #0d1a12; color: #e8f5e9; padding: 14px 18px; border-radius: 12px; border: 1px solid #2d7a48; font-family: 'Space Grotesk', sans-serif; min-width: 180px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);">
-            <div style="font-size: 14px; font-weight: 800; margin-bottom: 2px; color: #fff;">${id}</div>
-            <div style="font-size: 9px; color: ${liveColor}; text-transform: uppercase; font-weight: 700; letter-spacing: 0.12em; margin-bottom: 10px;">Bubble Score: ${liveScore}/100</div>
+          <div style="background: #0d1a12; color: #e8f5e9; padding: 14px 18px; border-radius: 12px; border: 1px solid #2d7a48; font-family: 'Space Grotesk', sans-serif; min-width: 190px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);">
+            <div style="font-size: 14px; font-weight: 800; margin-bottom: 2px; color: #fff;">${cityLabel}</div>
+            <div style="font-size: 9px; color: ${liveColor}; text-transform: uppercase; font-weight: 700; letter-spacing: 0.12em; margin-bottom: 10px;">${id} · Bubble Score ${liveScore}/100</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid #1a3a24; padding-top: 8px;">
               <div><div style="font-size: 8px; color: #6abf88; text-transform: uppercase; font-weight: 700;">Risk</div><div style="font-size: 13px; color: ${liveColor}; font-weight: 800;">${liveScore}/100</div></div>
-              <div><div style="font-size: 8px; color: #6abf88; text-transform: uppercase; font-weight: 700;">PI Ratio</div><div style="font-size: 13px; color: #fff; font-weight: 800;">${livePir}x</div></div>
-              <div style="grid-column: 1/-1;"><div style="font-size: 8px; color: #6abf88; text-transform: uppercase; font-weight: 700;">Est. Price</div><div style="font-size: 13px; color: #fff; font-weight: 800;">${livePrice}</div></div>
+              <div><div style="font-size: 8px; color: #6abf88; text-transform: uppercase; font-weight: 700;">PI Ratio</div><div style="font-size: 13px; color: #fff; font-weight: 800;">${livePir}</div></div>
+              <div style="grid-column: 1/-1;"><div style="font-size: 8px; color: #6abf88; text-transform: uppercase; font-weight: 700;">Est. Median Price</div><div style="font-size: 14px; color: #fff; font-weight: 800;">${livePrice}</div></div>
             </div>
           </div>
         `)

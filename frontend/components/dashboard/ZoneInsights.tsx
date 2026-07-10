@@ -31,14 +31,16 @@ const ZoneInsights = () => {
     <AnimatePresence>
       <motion.div
         key={selectedZone.id}
-        initial={{ x: 400, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 400, opacity: 0 }}
-        className="fixed top-28 right-8 bottom-48 w-[400px] z-50 pointer-events-auto flex flex-col"
+        initial={{ y: 24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 24, opacity: 0 }}
+        className="fixed z-50 pointer-events-auto flex flex-col
+                   inset-x-3 bottom-3 top-auto max-h-[80vh]
+                   sm:inset-x-auto sm:top-28 sm:right-8 sm:bottom-48 sm:w-[400px] sm:max-h-none"
       >
         <div className="bg-white/95 backdrop-blur-3xl rounded-[32px] shadow-[0_40px_100px_rgba(0,0,0,0.3)] border border-white/40 overflow-hidden flex flex-col h-full ring-1 ring-black/5">
           {/* Header - Fixed */}
-          <div className="px-8 pt-8 pb-6 flex justify-between items-start shrink-0 bg-white/50 border-b border-slate-100/50">
+          <div className="px-5 sm:px-8 pt-6 sm:pt-8 pb-5 sm:pb-6 flex justify-between items-start shrink-0 bg-white/50 border-b border-slate-100/50">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${risk.bg} ${risk.color}`}>
@@ -67,7 +69,7 @@ const ZoneInsights = () => {
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto px-8 py-4 space-y-8 scroll-smooth select-text custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-4 space-y-8 scroll-smooth select-text custom-scrollbar">
             {/* Core Metrics Grid */}
             <div className="grid grid-cols-2 gap-4 pt-4">
               <MetricBox 

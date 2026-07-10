@@ -81,11 +81,11 @@ const BottomDrawer = () => {
       initial={false}
       animate={{ height: isExpanded ? 540 : 100 }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-64px)] max-w-6xl bg-white/90 backdrop-blur-3xl z-40 flex flex-col px-10 py-6 rounded-[32px] shadow-[0_20px_80px_rgba(0,0,0,0.15)] border border-black/5 pointer-events-auto overflow-hidden"
+      className="fixed bottom-3 sm:bottom-8 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] sm:w-[calc(100%-64px)] max-w-6xl max-h-[82vh] bg-white/90 backdrop-blur-3xl z-40 flex flex-col px-5 sm:px-10 py-4 sm:py-6 rounded-[28px] sm:rounded-[32px] shadow-[0_20px_80px_rgba(0,0,0,0.15)] border border-black/5 pointer-events-auto overflow-hidden"
     >
       {/* Top bar — always visible */}
-      <div className="flex items-center justify-between border-b border-black/5 pb-4 mb-5">
-        <div className="flex items-center gap-10">
+      <div className="flex items-center justify-between border-b border-black/5 pb-4 mb-5 gap-4">
+        <div className="flex items-center gap-5 sm:gap-10 overflow-x-auto no-scrollbar min-w-0">
           <div className="flex flex-col">
             <span className="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase">Region Hub</span>
             <span className="text-[14px] mt-0.5 font-extrabold text-[#0f4d23] tracking-tighter">{activeRegion}</span>
@@ -124,16 +124,16 @@ const BottomDrawer = () => {
           </div>
         </div>
 
-        <div className="flex gap-4 items-center">
-          <button 
+        <div className="flex gap-4 items-center shrink-0">
+          <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className={`flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all ${
-              isExpanded 
-              ? 'bg-[#0f4d23] text-white shadow-lg' 
+            className={`flex items-center gap-2 px-3 sm:px-5 py-2 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all ${
+              isExpanded
+              ? 'bg-[#0f4d23] text-white shadow-lg'
               : 'bg-[#0f4d2310] text-[#0f4d23] hover:bg-[#0f4d2320]'
             }`}
           >
-            {isExpanded ? 'Hide Analytics' : 'Live Metrics'}
+            <span className="hidden sm:inline">{isExpanded ? 'Hide Analytics' : 'Live Metrics'}</span>
             {isExpanded ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
           </button>
         </div>
@@ -148,13 +148,13 @@ const BottomDrawer = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.2 }}
-              className="flex flex-row gap-6 pb-6 h-full items-stretch"
+              className="flex flex-col lg:flex-row gap-6 pb-6 h-full items-stretch"
             >
               {/* Column 1: Targeted Risk Analysis */}
               <div className="flex-1 bg-slate-50/40 rounded-[24px] border border-black/5 p-5 flex flex-col relative overflow-hidden group/container min-h-[380px]">
                  <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Targeted Risk Analysis</h5>
                  <div className="flex flex-row items-center flex-1">
-                   <div className="flex-1 h-full min-w-[240px]">
+                   <div className="flex-1 h-full min-w-0 sm:min-w-[240px]">
                      <RiskRadar 
                        data={{ piRatio, prRatio, affordability, capSpread }}
                        score={displayScore}
@@ -188,7 +188,7 @@ const BottomDrawer = () => {
               <div className="flex-1 bg-slate-50/40 rounded-[24px] border border-black/5 p-5 flex flex-col relative overflow-hidden group/container min-h-[380px]">
                  <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Market Position Index</h5>
                  <div className="flex flex-row items-center flex-1">
-                   <div className="flex-1 h-full min-w-[240px]">
+                   <div className="flex-1 h-full min-w-0 sm:min-w-[240px]">
                      <MarketQuadrant 
                        activeCity={activeRegion}
                        activeRisk={displayScore}

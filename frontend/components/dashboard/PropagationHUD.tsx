@@ -43,7 +43,9 @@ const PropagationHUD = () => {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -50 }}
-          className="fixed left-8 top-1/4 w-80 max-h-[400px] z-50 flex flex-col pointer-events-none"
+          className="fixed z-50 flex flex-col pointer-events-none max-h-[400px]
+                     left-3 top-20 w-[min(320px,90vw)]
+                     sm:left-8 sm:top-1/4 sm:w-80"
         >
           {/* HUD Header */}
           <div className="bg-black/80 backdrop-blur-xl border-l-4 border-emerald-500 p-4 rounded-tr-2xl shadow-2xl flex items-center justify-between">
