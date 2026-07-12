@@ -1,7 +1,7 @@
-// Use absolute URL from env if available to bypass proxy during dev
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || ''
+// Use the Render backend URL in production; fall back to local proxy in dev.
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://luminous-real-estate-1-2.onrender.com').replace(/\/$/, '')
 
-export async function api<T = any>(path: string, opts?: RequestInit): Promise<T> {
+export async function api<T = unknown>(path: string, opts?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...opts,
     headers: {

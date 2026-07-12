@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://luminous-real-estate.onrender.com';
+  const backendUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://luminous-real-estate-1-2.onrender.com').replace(/\/$/, '');
   
   try {
     console.log(`[Vercel Cron] Pinging backend at ${backendUrl}/health`);
@@ -28,11 +28,12 @@ export async function GET() {
       backendStatus: data,
       timestamp: new Date().toISOString()
     });
-  } catch (error: any) {
-    console.error('[Vercel Cron] Ping failed:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[Vercel Cron] Ping failed:', message);
     return NextResponse.json({ 
       success: false, 
-      error: error.message 
+      error: message 
     }, { status: 500 });
   }
 }

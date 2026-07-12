@@ -48,14 +48,24 @@ class WebSocketClient {
     }
   }
 
-  send(message: any) {
+  send(message: unknown) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message))
     }
   }
 }
 
-// Singleton instance (URL could be env var)
-const wsClient = new WebSocketClient(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws')
+const defaultClientId =
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `client-${Date.now()}`
+
+const resolveWebSocketUrl = () => {
+  const baseUrl = (process.env.NEXT_PUBLIC_WS_URL || 'wss://luminous-real-estate-1-2.onrender.com/ws').replace(/\/$/, '')
+  return baseUrl.endsWith('/ws') ? `${baseUrl}/${defaultClientId}` : baseUrl
+}
+
+// Singleton instance for the Render backend.
+const wsClient = new WebSocketClient(resolveWebSocketUrl())
 
 export default wsClient
