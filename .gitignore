@@ -36,3 +36,5 @@ ENV/
 backend/re_bubble_engine/server_log.txt
 backend/re_bubble_engine/verification_report.pdf
 
+.vercel
+.env*.local
