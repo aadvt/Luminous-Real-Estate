@@ -50,62 +50,7 @@ const XRAY = { safe: '#2fbf71', watch: '#ffab2e', high: '#ff5050', other: '#ddd7
 const riskColor = (risk: number) =>
   risk > 7 ? '#ff5050' : risk > 4 ? '#ffab2e' : '#2fbf71'
 
-const CAR_COLORS = ['#f5f1e8', '#1e1b2e', '#ff5c5c', '#58b9f0', '#ffc845', '#f45ea9', '#2fbf71']
-
-// ---- Sprite + texture generation (canvas → map images) -----------------
-
-const roundedPath = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
-  ctx.beginPath()
-  if (typeof (ctx as any).roundRect === 'function') {
-    ;(ctx as any).roundRect(x, y, w, h, r)
-  } else {
-    ctx.rect(x, y, w, h)
-  }
-}
-
-/** Top-down car sprite: body, windshield, rear window, headlights. Nose points north. */
-const makeCarImage = (color: string): ImageData | null => {
-  const W = 22
-  const H = 40
-  const cv = document.createElement('canvas')
-  cv.width = W
-  cv.height = H
-  const ctx = cv.getContext('2d')
-  if (!ctx) return null
-
-  // drop shadow
-  ctx.fillStyle = 'rgba(30,27,46,0.3)'
-  roundedPath(ctx, 1.5, 3.5, W - 3, H - 5, 7)
-  ctx.fill()
-  // body
-  ctx.fillStyle = color
-  roundedPath(ctx, 2, 1, W - 4, H - 4, 7)
-  ctx.fill()
-  ctx.strokeStyle = 'rgba(30,27,46,0.55)'
-  ctx.lineWidth = 1.5
-  ctx.stroke()
-  // roof sheen
-  ctx.fillStyle = 'rgba(255,255,255,0.18)'
-  roundedPath(ctx, 4.5, 17, W - 9, 9, 3)
-  ctx.fill()
-  // windshield (front = top)
-  ctx.fillStyle = 'rgba(30,27,46,0.5)'
-  roundedPath(ctx, 4.5, 9, W - 9, 7, 2.5)
-  ctx.fill()
-  // rear window
-  roundedPath(ctx, 4.5, H - 13, W - 9, 5.5, 2.5)
-  ctx.fill()
-  // headlights
-  ctx.fillStyle = 'rgba(255,240,190,0.95)'
-  ctx.fillRect(4, 1.5, 4.5, 2.5)
-  ctx.fillRect(W - 8.5, 1.5, 4.5, 2.5)
-  // tail lights
-  ctx.fillStyle = 'rgba(255,80,80,0.9)'
-  ctx.fillRect(4, H - 5.5, 4.5, 2)
-  ctx.fillRect(W - 8.5, H - 5.5, 4.5, 2)
-
-  return ctx.getImageData(0, 0, W, H)
-}
+// ---- Texture generation (canvas → map images) ---------------------------
 
 /** Tiny deterministic PRNG so facade windows are stable across rebuilds. */
 const seededRand = (seed: number) => () => {
@@ -170,37 +115,6 @@ const facadeStep = (mid: string, high: string, sfx: string): any => [
   110, `fac-${high}-${sfx}`,
 ]
 
-// ---- Traffic simulation types ------------------------------------------
-type CarPath = { pts: [number, number][]; cum: number[]; len: number }
-type Car = { path: number; t: number; dir: 1 | -1; speed: number; icon: string; brg: number }
-
-/** Approximate planar distance in metres — fine at city scale. */
-const distM = (a: number[], b: number[]) => {
-  const dx = (b[0] - a[0]) * 111320 * Math.cos(((a[1] + b[1]) * 0.5 * Math.PI) / 180)
-  const dy = (b[1] - a[1]) * 110540
-  return Math.sqrt(dx * dx + dy * dy)
-}
-
-/** Position along a path at distance t (linear interpolation). */
-const pointAt = (path: CarPath, t: number): [number, number] => {
-  const { pts, cum } = path
-  if (t <= 0) return pts[0]
-  if (t >= path.len) return pts[pts.length - 1]
-  let lo = 0
-  let hi = cum.length - 1
-  while (lo < hi - 1) {
-    const mid = (lo + hi) >> 1
-    if (cum[mid] <= t) lo = mid
-    else hi = mid
-  }
-  const seg = cum[hi] - cum[lo] || 1
-  const f = (t - cum[lo]) / seg
-  return [
-    pts[lo][0] + (pts[hi][0] - pts[lo][0]) * f,
-    pts[lo][1] + (pts[hi][1] - pts[lo][1]) * f,
-  ]
-}
-
 const EMPTY_FC: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] }
 const NO_BUILDING_FILTER: any = ['all', ['==', ['get', 'extrude'], 'true'], ['==', ['id'], -1]]
 
@@ -224,11 +138,7 @@ const MapboxReality = () => {
     reduceMotion: false,
     introDone: false,
     lastInteraction: Date.now(),
-    lastCarPush: 0,
-    lastBuild: 0,
-    buildCenter: null as [number, number] | null,
   })
-  const traffic = useRef<{ paths: CarPath[]; cars: Car[] }>({ paths: [], cars: [] })
   const hoverBldg = useRef<string | number | null>(null)
   const hoverZone = useRef<string | number | null>(null)
   const markerElemsRef = useRef<Record<string, { el: HTMLDivElement; dot: HTMLSpanElement; price: HTMLSpanElement }>>({})
@@ -325,78 +235,6 @@ const MapboxReality = () => {
     }
   }
 
-  // ---- Traffic: sample real road geometry from loaded vector tiles -------
-  const buildTraffic = (m: mapboxgl.Map) => {
-    const a = anim.current
-    const now = Date.now()
-    if (now - a.lastBuild < 4000) return
-    if (m.getZoom() < 13.2) return
-    const c = m.getCenter()
-    if (
-      a.buildCenter &&
-      traffic.current.paths.length > 0 &&
-      distM([c.lng, c.lat], a.buildCenter) < 1200
-    ) return
-    a.lastBuild = now
-    a.buildCenter = [c.lng, c.lat]
-
-    let feats: any[] = []
-    try {
-      feats = m.querySourceFeatures('composite', {
-        sourceLayer: 'road',
-        filter: [
-          'match', ['get', 'class'],
-          ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'street'],
-          true, false,
-        ] as any,
-      })
-    } catch {
-      return
-    }
-
-    const paths: CarPath[] = []
-    const seen = new Set<string>()
-    for (const f of feats) {
-      const geom = f.geometry
-      const parts =
-        geom.type === 'LineString' ? [geom.coordinates]
-        : geom.type === 'MultiLineString' ? geom.coordinates
-        : []
-      for (const raw of parts) {
-        if (raw.length < 2) continue
-        const key = `${raw[0]}|${raw[raw.length - 1]}|${raw.length}`
-        if (seen.has(key)) continue
-        seen.add(key)
-        const cum = [0]
-        let len = 0
-        for (let i = 1; i < raw.length; i++) {
-          len += distM(raw[i - 1], raw[i])
-          cum.push(len)
-        }
-        if (len < 180) continue
-        paths.push({ pts: raw as [number, number][], cum, len })
-        if (paths.length >= 90) break
-      }
-      if (paths.length >= 90) break
-    }
-    if (paths.length === 0) return
-
-    const cars: Car[] = []
-    const n = Math.min(96, Math.ceil(paths.length * 2.5))
-    for (let i = 0; i < n; i++) {
-      const p = Math.floor(Math.random() * paths.length)
-      cars.push({
-        path: p,
-        t: Math.random() * paths[p].len,
-        dir: Math.random() > 0.5 ? 1 : -1,
-        speed: 6 + Math.random() * 12, // m/s ≈ 22–65 km/h
-        icon: `car-${i % CAR_COLORS.length}`,
-        brg: 0,
-      })
-    }
-    traffic.current = { paths, cars }
-  }
-
   // ==========================================================================
   // Map init
   // ==========================================================================
@@ -417,9 +255,6 @@ const MapboxReality = () => {
       pitch: 0,
       bearing: 0,
       antialias: true,
-      // No symbol fade: the traffic source updates ~30×/s and each update
-      // re-places symbols — with a fade they'd sit at 0 opacity forever.
-      fadeDuration: 0,
     })
 
     const container = mapContainer.current
@@ -444,7 +279,6 @@ const MapboxReality = () => {
           // a failed sprite falls back to flat colors — never fatal
         }
       }
-      CAR_COLORS.forEach((color, i) => safeAddImage(`car-${i}`, () => makeCarImage(color)))
       for (const hex of FACADE_COLORS) {
         safeAddImage(`fac-${hex}-day`, () => makeFacadeImage(hex, false))
         safeAddImage(`fac-${hex}-lit`, () => makeFacadeImage(hex, true))
@@ -577,35 +411,6 @@ const MapboxReality = () => {
         paint: { 'line-color': '#7b61ff', 'line-width': 3, 'line-dasharray': [2, 1] },
       })
 
-      // ---- Traffic layer: rotating car sprites on real roads ----
-      m.addSource('cars', { type: 'geojson', data: EMPTY_FC })
-      m.addLayer(
-        {
-          id: 'cars',
-          type: 'symbol',
-          source: 'cars',
-          minzoom: 13,
-          layout: {
-            'icon-image': ['get', 'icon'],
-            'icon-size': [
-              'interpolate', ['linear'], ['zoom'],
-              13, 0.42,
-              15.5, 1.0,
-              18, 1.8,
-            ],
-            'icon-rotate': ['get', 'bearing'],
-            'icon-rotation-alignment': 'map',
-            'icon-pitch-alignment': 'map',
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': true,
-          },
-          paint: {
-            'icon-emissive-strength': 1,
-          },
-        },
-        labelLayerId
-      )
-
       // ---- Zone hover glow ----
       m.on('mousemove', 'zones-fill', (e) => {
         m.getCanvas().style.cursor = 'pointer'
@@ -690,9 +495,6 @@ const MapboxReality = () => {
         }
       })
 
-      // ---- Rebuild the traffic network when tiles settle ----
-      m.on('idle', () => buildTraffic(m))
-
       setMapLoaded(true)
     })
 
@@ -734,7 +536,7 @@ const MapboxReality = () => {
   }, [])
 
   // ==========================================================================
-  // Master animation loop: traffic + idle orbit + FPS guard
+  // Master animation loop: idle orbit + FPS guard
   // ==========================================================================
   useEffect(() => {
     if (!mapLoaded) return
@@ -755,10 +557,7 @@ const MapboxReality = () => {
       if (!m) return
       if (!a.degraded && t - a.startT > 8000 && a.fpsEma < 22) {
         a.degraded = true
-        try {
-          if (m.getLayer('cars')) m.setLayoutProperty('cars', 'visibility', 'none')
-        } catch { /* ignore */ }
-        console.info('[map] low FPS — traffic + orbit disabled')
+        console.info('[map] low FPS — idle orbit disabled')
       }
 
       if (document.hidden || a.degraded || a.reduceMotion) return
@@ -773,45 +572,6 @@ const MapboxReality = () => {
         !m.isMoving()
       ) {
         m.setBearing(m.getBearing() + 0.0011 * dt) // ≈ 1 rotation / 5.5 min
-      }
-
-      // Traffic
-      const { paths, cars } = traffic.current
-      if (paths.length && cars.length && m.getZoom() >= 13 && m.getSource('cars')) {
-        for (const car of cars) {
-          car.t += car.dir * car.speed * (dt / 1000)
-          const p = paths[car.path]
-          if (car.t > p.len || car.t < 0) {
-            car.path = Math.floor(Math.random() * paths.length)
-            car.dir = Math.random() > 0.5 ? 1 : -1
-            car.t = car.dir > 0 ? 0 : paths[car.path].len
-          }
-        }
-        // Push to the GPU at ~30fps, not every frame
-        if (t - a.lastCarPush >= 33) {
-          a.lastCarPush = t
-          const features = cars.map((car) => {
-            const p = paths[car.path]
-            const pos = pointAt(p, car.t)
-            // Heading from a short look-ahead along the travel direction
-            const aheadT = car.dir > 0 ? Math.min(car.t + 5, p.len) : Math.max(car.t - 5, 0)
-            const ahead = pointAt(p, aheadT)
-            if (ahead[0] !== pos[0] || ahead[1] !== pos[1]) {
-              const dx = (ahead[0] - pos[0]) * Math.cos((pos[1] * Math.PI) / 180)
-              const dy = ahead[1] - pos[1]
-              car.brg = (Math.atan2(dx, dy) * 180) / Math.PI
-            }
-            return {
-              type: 'Feature' as const,
-              geometry: { type: 'Point' as const, coordinates: pos },
-              properties: { icon: car.icon, bearing: car.brg },
-            }
-          })
-          ;(m.getSource('cars') as mapboxgl.GeoJSONSource).setData({
-            type: 'FeatureCollection',
-            features,
-          })
-        }
       }
     }
 
